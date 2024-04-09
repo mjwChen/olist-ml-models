@@ -1,19 +1,26 @@
-with tb_join as (
-
-select t2.*
-, t3.idVendedor
+with tb_pedidos as (
+select DISTINCT t1.idPedido
+, t2.idVendedor
 
     from pedido as t1
 
-    left join pagamento_pedido as t2
+    left join item_pedido as t2
     on t1.idPedido = t2.idPedido
-
-    left join item_pedido t3
-    on t1.idPedido = t3.idPedido
 
         where t1.dtPedido < '2018-01-01'
         and t1.dtPedido >= date('2018-01-01', '-6 month')
-        and t3.idVendedor is not null
+        and idVendedor is not null
+),
+
+tb_join as (
+
+select t1.idVendedor
+, t2.*
+
+    from tb_pedidos as t1
+
+    left join pagamento_pedido as t2
+    on t1.idPedido = t2.idPedido
 ), 
 
 tb_group as (
@@ -30,7 +37,9 @@ select idVendedor
 
             order by idVendedor
             , descTipoPagamento
-)
+),
+
+tb_summary as (
 
 select idVendedor
 , sum(case when descTipoPagamento = 'credit_card' then qtdePedidoMeioPagamento 
@@ -87,3 +96,12 @@ end) / sum(vlPedidoMeioPagamento) as pct_valor_voucher_pedido
     from tb_group
 
         group by 1
+)
+
+select idVendedor
+, avg(nrParcelas) as avgQtdParcelas
+, percentile 
+
+    from tb_join
+
+        where descTipoPagamento = 'credit_card'
