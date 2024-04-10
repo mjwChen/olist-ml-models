@@ -97,7 +97,9 @@ end) / sum(vlPedidoMeioPagamento) as pct_valor_voucher_pedido
 
         group by 1
 )
-
+--Dia 03 - Criação Feature Store Pt. 2
+-- PERCENTILE function doesnt exist
+-- 32 min in the video
 select idVendedor
 , avg(nrParcelas) as avgQtdParcelas
 , percentile 
